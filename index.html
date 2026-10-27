@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>扫码制码助理 · 界面预览</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(1200px 600px at 20% 0%, #EAF0FF 0%, #EDEFF6 45%, #E7EAF2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: #14161F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+  .stage { display: flex; align-items: center; gap: 56px; max-width: 1080px; }
+  .notes { max-width: 330px; }
+  .notes h1 { font-size: 26px; margin: 0 0 8px; letter-spacing: 0.3px; }
+  .notes .sub { font-size: 13px; color: #7C8296; line-height: 1.7; margin-bottom: 22px; }
+  .notes ul { margin: 0; padding: 0; list-style: none; }
+  .notes li { font-size: 13px; color: #4A5164; line-height: 1.6; padding: 10px 0 10px 22px; position: relative; border-top: 1px solid rgba(20,22,31,0.06); }
+  .notes li:first-child { border-top: none; }
+  .notes li::before { content: ''; position: absolute; left: 4px; top: 17px; width: 6px; height: 6px; border-radius: 50%; background: #3A6BFF; }
+  .notes .foot { margin-top: 22px; font-size: 11px; color: #A8AEC0; line-height: 1.7; }
+
+  /* ---------- 手机 ---------- */
+  .phone {
+    width: 390px; height: 800px; flex: none;
+    background: #F4F6FA; border-radius: 46px; position: relative;
+    box-shadow: 0 40px 80px rgba(24, 34, 66, 0.22), 0 0 0 10px #10131C, 0 0 0 12px #2A2F3D;
+    overflow: hidden; display: flex; flex-direction: column;
+  }
+  .statusbar {
+    height: 44px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 26px; font-size: 13px; font-weight: 600; color: #14161F; background: #fff;
+  }
+  .statusbar .right { letter-spacing: 2px; font-size: 11px; color: #4A5164; }
+  .navbar { height: 42px; flex: none; display: flex; align-items: center; justify-content: center; background: #fff; font-size: 16px; font-weight: 600; border-bottom: 1px solid #F0F2F7; }
+  .body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 14px 14px 24px; scroll-behavior: smooth; }
+  .body::-webkit-scrollbar { width: 0; }
+
+  .tabbar {
+    flex: none; height: 64px; background: #fff; border-top: 1px solid #F0F2F7;
+    display: flex; align-items: center; padding-bottom: 6px;
+  }
+  .tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 10px; color: #8A90A2; cursor: pointer; user-select: none;
+  }
+  .tab svg { width: 22px; height: 22px; stroke: #8A90A2; fill: none; stroke-width: 2.1; }
+  .tab.on { color: #3A6BFF; font-weight: 700; }
+  .tab.on svg { stroke: #3A6BFF; }
+
+  /* ---------- 通用 ---------- */
+  .screen { display: none; }
+  .screen.on { display: block; animation: fade 0.22s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .page-title { font-size: 23px; font-weight: 700; letter-spacing: 0.3px; }
+  .page-sub { font-size: 12px; color: #8A90A2; margin-top: 3px; margin-bottom: 14px; }
+  .card { background: #fff; border-radius: 14px; padding: 15px; box-shadow: 0 3px 14px rgba(20,22,31,0.05); margin-bottom: 12px; }
+  .sec-title { display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+  .sec-title .more { font-size: 11px; color: #8A90A2; font-weight: 400; cursor: pointer; }
+  .badge { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 5px; font-size: 11px; font-weight: 600; background: #EDF2FF; color: #3A6BFF; }
+  .badge.mint { background: #E6F8F5; color: #0EA5A0; }
+  .badge.gray { background: #F1F3F8; color: #6B7280; }
+  .muted { font-size: 11px; color: #8A90A2; }
+
+  /* ---------- 解码 ---------- */
+  .hero {
+    border-radius: 16px; padding: 18px 16px 16px; position: relative; overflow: hidden;
+    background: linear-gradient(155deg, #3A6BFF 0%, #5B87FF 55%, #7BA2FF 100%);
+    box-shadow: 0 10px 24px rgba(58,107,255,0.28); margin-bottom: 12px;
+  }
+  .hero::after { content: ''; position: absolute; right: -40px; top: -60px; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,0.1); }
+  .frame { position: relative; width: 100px; height: 100px; margin: 4px auto 12px; }
+  .corner { position: absolute; width: 23px; height: 23px; border: 2.5px solid rgba(255,255,255,0.95); border-radius: 3px; }
+  .corner.tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+  .corner.tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+  .corner.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+  .corner.br { bottom: 0; right: 0; border-left: none; border-top: none; }
+  .laser { position: absolute; left: 6px; right: 6px; height: 2px; border-radius: 2px; background: #fff; box-shadow: 0 0 8px 2px rgba(255,255,255,0.85); animation: scan 2.4s ease-in-out infinite; }
+  @keyframes scan { 0% { top: 12px; opacity: 0.2; } 45% { top: 86px; opacity: 1; } 55% { top: 86px; opacity: 1; } 100% { top: 12px; opacity: 0.2; } }
+  .hero h2 { font-size: 17px; color: #fff; text-align: center; margin: 0 0 5px; }
+  .hero p { font-size: 11px; color: rgba(255,255,255,0.8); text-align: center; margin: 0 0 14px; line-height: 1.6; }
+  .hero-btn {
+    position: relative; z-index: 2; height: 46px; border-radius: 10px; background: #fff; color: #2F5DE8;
+    font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(24,45,120,0.18); transition: transform 0.12s;
+  }
+  .hero-btn:active { transform: scale(0.985); }
+  .hero .tip { font-size: 10px; color: rgba(255,255,255,0.68); text-align: center; margin-top: 9px; }
+
+  .result-body { padding: 12px; background: #F7F8FC; border-radius: 8px; font-size: 14px; line-height: 1.6; word-break: break-all; font-family: "SF Mono", Menlo, Consolas, monospace; margin: 8px 0 12px; }
+  .meta-row { display: flex; gap: 8px; }
+  .meta-row > div { flex: 1; }
+  .meta-label { font-size: 10px; color: #9AA0B0; }
+  .meta-value { font-size: 12px; color: #3C4254; font-weight: 500; margin-top: 2px; }
+  .actions { display: flex; gap: 8px; margin-top: 12px; }
+  .mini-btn { flex: 1; height: 36px; border-radius: 8px; background: #F4F6FA; color: #4A5164; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .mini-btn.primary { background: #3A6BFF; color: #fff; }
+  .mini-btn.ghost { background: #fff; border: 1px solid #D8E1FF; color: #3A6BFF; }
+
+  .today-num { font-size: 30px; font-weight: 700; line-height: 1; }
+  .today-num span { font-size: 12px; color: #8A90A2; font-weight: 400; margin-left: 3px; }
+  .recent { display: flex; align-items: center; gap: 9px; padding: 9px 0; border-top: 1px solid #F2F4F9; }
+  .recent:first-of-type { border-top: none; }
+  .recent .badge { flex: none; }
+  .recent .txt { font-size: 13px; color: #2A2F3D; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .recent .time { font-size: 10px; color: #9AA0B0; margin-top: 2px; }
+  .empty { text-align: center; color: #9AA0B0; font-size: 12px; padding: 26px 0; }
+
+  /* ---------- 制码 ---------- */
+  .segment { display: flex; padding: 3px; background: #F2F4F9; border-radius: 8px; margin-bottom: 14px; }
+  .seg { flex: 1; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #7C8296; cursor: pointer; transition: all 0.16s; }
+  .seg.on { background: #fff; color: #2F5DE8; font-weight: 700; box-shadow: 0 2px 6px rgba(20,22,31,0.08); }
+  .field-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: #6B7280; margin: 4px 0 8px; font-weight: 500; }
+  .field-label .count { font-size: 10px; color: #A8AEC0; font-weight: 400; }
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 13px; }
+  .chip { height: 32px; padding: 0 13px; border-radius: 7px; background: #F4F6FA; color: #5A6072; font-size: 12px; display: flex; align-items: center; border: 1px solid transparent; cursor: pointer; transition: all 0.14s; }
+  .chip.on { background: #EDF2FF; color: #2F5DE8; border-color: #C6D6FF; font-weight: 700; }
+  textarea {
+    width: 100%; min-height: 88px; padding: 11px 12px; background: #F7F8FC; border: none; border-radius: 8px;
+    font-size: 14px; line-height: 1.6; color: #14161F; resize: none; font-family: inherit; outline: none;
+  }
+  .hint { font-size: 11px; color: #9AA0B0; margin-top: 8px; line-height: 1.6; }
+  .btn-primary { margin-top: 14px; height: 46px; border-radius: 10px; background: #3A6BFF; color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 14px rgba(58,107,255,0.28); cursor: pointer; }
+  .btn-primary:active { transform: scale(0.99); }
+  .btn-primary.off { background: #C9D2E8; box-shadow: none; }
+  .canvas-wrap { display: flex; justify-content: center; padding: 8px 0 12px; }
+  canvas { border-radius: 8px; border: 1px solid #EEF0F5; background: #fff; }
+  .info { padding: 10px 11px; background: #F8F9FC; border-radius: 8px; }
+  .info-grid { display: flex; gap: 8px; margin-top: 8px; }
+  .info-grid > div { flex: 1; }
+  .tipbox .tip { display: flex; gap: 6px; font-size: 11px; color: #7C8296; line-height: 1.65; padding: 6px 0; }
+  .tipbox .dot { flex: none; width: 4px; height: 4px; border-radius: 50%; background: #C7CEDF; margin-top: 6px; }
+
+  /* ---------- 我 ---------- */
+  .overview { border-radius: 16px; padding: 17px 16px 15px; background: linear-gradient(155deg, #2B3A67, #3D4F86 60%, #4A5F9E); color: #fff; box-shadow: 0 10px 24px rgba(43,58,103,0.22); margin-bottom: 12px; }
+  .ov-top { display: flex; align-items: center; gap: 11px; }
+  .avatar { width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.28); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
+  .ov-title { font-size: 16px; font-weight: 700; }
+  .ov-sub { font-size: 11px; color: rgba(255,255,255,0.62); margin-top: 2px; }
+  .ov-stats { display: flex; align-items: center; margin-top: 15px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,0.14); }
+  .ov-stats > div { flex: 1; text-align: center; }
+  .ov-num { font-size: 22px; font-weight: 700; line-height: 1.1; }
+  .ov-label { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .ov-stats > .ov-line { flex: 0 0 1px; width: 1px; height: 26px; background: rgba(255,255,255,0.14); }
+  .menu { padding: 2px 15px; }
+  .menu-item { display: flex; align-items: center; gap: 10px; padding: 13px 0; border-bottom: 1px solid #F1F3F8; cursor: pointer; }
+  .menu-item:last-child { border-bottom: none; }
+  .menu-item:active { opacity: 0.6; }
+  .menu-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex: none; }
+  .menu-title { font-size: 14px; font-weight: 600; }
+  .menu-desc { font-size: 11px; color: #9AA0B0; margin-top: 1px; }
+  .menu-count { font-size: 13px; color: #8A90A2; font-weight: 600; }
+  .arrow { color: #C7CEDF; font-size: 17px; line-height: 1; }
+
+  /* ---------- 详情页 ---------- */
+  .back { font-size: 13px; color: #3A6BFF; cursor: pointer; display: inline-flex; align-items: center; gap: 3px; margin-bottom: 10px; }
+  .hist-item { background: #fff; border-radius: 12px; padding: 13px; margin-bottom: 10px; box-shadow: 0 2px 10px rgba(20,22,31,0.04); }
+  .hist-head { display: flex; align-items: center; gap: 6px; }
+  .hist-head .time { margin-left: auto; font-size: 10px; color: #A8AEC0; }
+  .hist-content { margin-top: 9px; font-size: 13px; line-height: 1.55; color: #23283A; word-break: break-all; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-family: "SF Mono", Menlo, Consolas, monospace; }
+  .hist-foot { margin-top: 9px; padding-top: 8px; border-top: 1px solid #F2F4F9; font-size: 10px; color: #A8AEC0; display: flex; justify-content: space-between; }
+  .kpi { display: flex; background: #fff; border-radius: 14px; padding: 15px 0; margin-bottom: 12px; box-shadow: 0 3px 14px rgba(20,22,31,0.05); }
+  .kpi > div { flex: 1; text-align: center; }
+  .kpi .n { font-size: 24px; font-weight: 700; }
+  .kpi .l { font-size: 10px; color: #8A90A2; margin-top: 2px; }
+  .chart { display: flex; align-items: flex-end; justify-content: space-between; height: 150px; padding-top: 6px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .bar-v { font-size: 10px; color: #6B7280; font-weight: 600; margin-bottom: 3px; }
+  .bar-track { height: 90px; display: flex; align-items: flex-end; }
+  .bar { width: 18px; border-radius: 5px 5px 2px 2px; background: #DCE5FF; }
+  .bar.today { background: linear-gradient(180deg, #5B87FF, #3A6BFF); }
+  .bar-l { margin-top: 6px; font-size: 9px; color: #A8AEC0; white-space: nowrap; }
+  .bar-l.today { color: #3A6BFF; font-weight: 600; }
+  .dist-item { margin-bottom: 13px; }
+  .dist-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+  .dist-top .c { font-size: 10px; color: #8A90A2; }
+  .dist-track { height: 7px; border-radius: 4px; background: #F2F4F9; overflow: hidden; }
+  .dist-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #6E93FF, #3A6BFF); }
+
+  @media (max-width: 860px) {
+    .notes { display: none; }
+    body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="phone">
+    <div class="statusbar">
+      <span>9:41</span>
+      <span class="right">●●● ⌁ ▮</span>
+    </div>
+    <div class="navbar" id="navTitle">解码</div>
+
+    <div class="body" id="body">
+      <!-- ============ 解码 ============ -->
+      <section class="screen on" id="screen-decode">
+        <div class="page-title">解码</div>
+        <div class="page-sub">扫一扫，识别一维码 / 二维码并记录结果</div>
+
+        <div class="hero">
+          <div class="frame">
+            <div class="corner tl"></div><div class="corner tr"></div>
+            <div class="corner bl"></div><div class="corner br"></div>
+            <div class="laser"></div>
+          </div>
+          <h2>扫码解码</h2>
+          <p>支持二维码、Code 128、EAN-13、UPC-A、PDF417 等常见码制</p>
+          <div class="hero-btn" id="btnScan">⌗ 开始扫码 / 从相册识别</div>
+          <div class="tip">预览环境：点击后模拟一次扫码结果</div>
+        </div>
+
+        <div id="decodeResult"></div>
+
+        <div class="card">
+          <div class="sec-title"><span>今日解码</span><span class="more" data-go="history-decode">全部历史 ›</span></div>
+          <div class="today-num" id="todayCount">0<span>次</span></div>
+          <div id="recentList" style="margin-top:10px"></div>
+        </div>
+      </section>
+
+      <!-- ============ 制码 ============ -->
+      <section class="screen" id="screen-encode">
+        <div class="page-title">制码</div>
+        <div class="page-sub">输入内容，生成可打印的一维码 / 二维码</div>
+
+        <div class="card">
+          <div class="segment">
+            <div class="seg on" data-cat="qrcode">二维码</div>
+            <div class="seg" data-cat="barcode">一维码</div>
+          </div>
+          <div class="field-label"><span>码制</span></div>
+          <div class="chips" id="typeChips"></div>
+          <div id="eclWrap">
+            <div class="field-label"><span>纠错等级</span><span class="count">等级越高越耐污损</span></div>
+            <div class="chips" id="eclChips"></div>
+          </div>
+          <div class="field-label"><span>内容</span><span class="count" id="countText">0 / 210 字节</span></div>
+          <textarea id="contentInput" placeholder="例如：https://example.com 或 一段文本"></textarea>
+          <div class="hint" id="hintText"></div>
+          <div class="btn-primary" id="btnGenerate">生成二维码</div>
+        </div>
+
+        <div class="card" id="encodeResult" style="display:none">
+          <div class="sec-title"><span>制码结果</span><span class="badge" id="resType">QR Code</span></div>
+          <div class="canvas-wrap"><canvas id="codeCanvas" width="260" height="260" style="width:260px;height:260px"></canvas></div>
+          <div class="info">
+            <div class="meta-label">内容</div>
+            <div class="meta-value" id="resContent" style="word-break:break-all"></div>
+            <div class="info-grid">
+              <div><div class="meta-label">版本 / 模块</div><div class="meta-value" id="resVer">-</div></div>
+              <div><div class="meta-label">参数</div><div class="meta-value" id="resParam">-</div></div>
+              <div><div class="meta-label">生成时间</div><div class="meta-value" id="resTime">-</div></div>
+            </div>
+          </div>
+          <div class="actions">
+            <div class="mini-btn ghost" id="btnCopyResult">复制内容</div>
+            <div class="mini-btn primary" id="btnDownload">保存图片</div>
+          </div>
+        </div>
+
+        <div class="tipbox">
+          <div class="tip"><span class="dot"></span><span>一维码打印时建议两端留出空白区（静区），否则扫描设备可能无法识别。</span></div>
+          <div class="tip"><span class="dot"></span><span>纠错等级 L/M/Q/H 对应约 7%/15%/25%/30% 破损容忍度，商品标签建议 M 或 Q。</span></div>
+          <div class="tip"><span class="dot"></span><span>每次制码结果都会自动记录到「我 - 制码历史」。</span></div>
+        </div>
+      </section>
+
+      <!-- ============ 我 ============ -->
+      <section class="screen" id="screen-mine">
+        <div class="overview">
+          <div class="ov-top">
+            <div class="avatar">码</div>
+            <div>
+              <div class="ov-title">我的扫码制码</div>
+              <div class="ov-sub">数据存储：云数据库</div>
+            </div>
+          </div>
+          <div class="ov-stats">
+            <div><div class="ov-num" id="ovDecode">0</div><div class="ov-label">解码总数</div></div>
+            <div class="ov-line"></div>
+            <div><div class="ov-num" id="ovEncode">0</div><div class="ov-label">制码总数</div></div>
+            <div class="ov-line"></div>
+            <div><div class="ov-num" id="ovToday">0</div><div class="ov-label">今日合计</div></div>
+          </div>
+        </div>
+
+        <div class="card menu">
+          <div class="menu-item" data-go="history-decode">
+            <div class="menu-ico" style="background:#EDF2FF;color:#3A6BFF">史</div>
+            <div style="flex:1"><div class="menu-title">解码历史</div><div class="menu-desc">查看已识别的码制与内容</div></div>
+            <div class="menu-count" id="mcDecode">0</div><div class="arrow">›</div>
+          </div>
+          <div class="menu-item" data-go="history-encode">
+            <div class="menu-ico" style="background:#E6F8F5;color:#0EA5A0">码</div>
+            <div style="flex:1"><div class="menu-title">制码历史</div><div class="menu-desc">查看生成过的条码与二维码</div></div>
+            <div class="menu-count" id="mcEncode">0</div><div class="arrow">›</div>
+          </div>
+          <div class="menu-item" data-go="stats-decode">
+            <div class="menu-ico" style="background:#FFF2E8;color:#E8762C">统</div>
+            <div style="flex:1"><div class="menu-title">解码统计</div><div class="menu-desc">近 7 日趋势与码制分布</div></div>
+            <div class="arrow">›</div>
+          </div>
+          <div class="menu-item" data-go="stats-encode">
+            <div class="menu-ico" style="background:#F0ECFF;color:#6C5CE7">计</div>
+            <div style="flex:1"><div class="menu-title">制码统计</div><div class="menu-desc">生成量趋势与码种分布</div></div>
+            <div class="arrow">›</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;font-size:10px;color:#AEB4C4;line-height:1.9;margin-top:16px">
+          扫码制码助理 v1.0.0<br />数据仅自己可见，不做社交分享与排行
+        </div>
+      </section>
+
+      <!-- ============ 历史 ============ -->
+      <section class="screen" id="screen-history">
+        <div class="back" data-back="1"><span style="font-size:17px;line-height:1">‹</span> 返回</div>
+        <div class="page-title" id="histTitle">解码历史</div>
+        <div class="page-sub" id="histSub">共 0 条记录</div>
+        <div id="histList"></div>
+      </section>
+
+      <!-- ============ 统计 ============ -->
+      <section class="screen" id="screen-stats">
+        <div class="back" data-back="1"><span style="font-size:17px;line-height:1">‹</span> 返回</div>
+        <div class="page-title" id="statTitle">解码统计</div>
+        <div class="page-sub">最近 7 天与码制分布</div>
+        <div class="kpi">
+          <div><div class="n" id="kTotal">0</div><div class="l">累计</div></div>
+          <div><div class="n" id="kToday">0</div><div class="l">今日</div></div>
+          <div><div class="n" id="kWeek">0</div><div class="l">近 7 日</div></div>
+        </div>
+        <div class="card">
+          <div class="sec-title"><span>近 7 日趋势</span><span class="more" id="kAvg">日均 0</span></div>
+          <div class="chart" id="chartBars"></div>
+        </div>
+        <div class="card">
+          <div class="sec-title"><span id="distTitle">码制分布</span><span class="more" id="distCount">0 种</span></div>
+          <div id="distList"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="tabbar">
+      <div class="tab on" data-tab="decode">
+        <svg viewBox="0 0 24 24"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M3.5 12h17"/></svg>
+        <span>解码</span>
+      </div>
+      <div class="tab" data-tab="encode">
+        <svg viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.4"/><rect x="14" y="4" width="6" height="6" rx="1.4"/><rect x="4" y="14" width="6" height="6" rx="1.4"/><path d="M14 14h2.5M19.5 14H20M14 19.5v.5M19 19h1M17 16.8v1"/></svg>
+        <span>制码</span>
+      </div>
+      <div class="tab" data-tab="mine">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 20c.6-3.6 3.6-5.8 7.2-5.8s6.6 2.2 7.2 5.8"/></svg>
+        <span>我</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h1>扫码制码助理</h1>
+    <div class="sub">微信小程序 · 界面预览。<br />此页面用<b>同一套编码引擎</b>（QR 编码器 / 一维码编码器）在浏览器里实时渲染，制码结果可直接用手机扫。</div>
+    <ul>
+      <li>解码：扫码 / 相册识别，结果分栏展示码制与数据，自动入库</li>
+      <li>制码：一维码或二维码 → 选码制 → 输内容 → 生成图片 -> 保存相册</li>
+      <li>我：解码历史 / 制码历史 / 解码统计 / 制码统计</li>
+      <li>数据存云数据库，仅本人可见；不做社交分享与排行</li>
+    </ul>
+    <div class="foot">预览里的数据存在浏览器内存中，刷新即清空。真实小程序使用云开发数据库。</div>
+  </div>
+</div>
+
+<script>
+  // 让 CommonJS 模块在浏览器中可运行
+  var __mods = {};
+  var module = { exports: {} };
+  function require(name) {
+    var key = String(name).replace('./', '');
+    if (key.indexOf('barcode-tables') >= 0) return __mods['barcode-tables'];
+    if (key.indexOf('qrcode') >= 0) return __mods['qrcode'];
+    if (key.indexOf('render') >= 0) return __mods['render'];
+    return __mods[key] || {};
+  }
+</script>
+<script src="../utils/barcode-tables.js"></script>
+<script>
+  __mods['barcode-tables'] = module.exports;
+  module = { exports: {} };
+</script>
+<script src="../utils/barcode.js"></script>
+<script>
+  __mods['barcode'] = module.exports;
+  var BARCODE = module.exports;
+  module = { exports: {} };
+</script>
+<script src="../utils/qrcode.js"></script>
+<script>
+  __mods['qrcode'] = module.exports;
+  var QRCODE = module.exports;
+  module = { exports: {} };
+</script>
+<script src="../utils/render.js"></script>
+<script>
+  __mods['render'] = module.exports;
+  var RENDER = module.exports;
+</script>
+
+<script>
+(function () {
+  var TYPES = {
+    qrcode: [{ key: 'QRCODE', name: 'QR Code', hint: '支持中文、链接与任意文本，可调纠错等级', ph: '例如：https://example.com 或 一段文本', max: 210 }],
+    barcode: [
+      { key: 'CODE128', name: 'Code 128', hint: '可见 ASCII 字符；纯数字偶数位时自动压缩为 C 码', ph: '例如：SN-2026-000123', max: 48 },
+      { key: 'EAN13', name: 'EAN-13', hint: '12 位数字自动补校验位，也支持直接输入 13 位', ph: '例如：690123456789', max: 13 },
+      { key: 'EAN8', name: 'EAN-8', hint: '7 位数字自动补校验位，也支持直接输入 8 位', ph: '例如：1234567', max: 8 },
+      { key: 'UPCA', name: 'UPC-A', hint: '11 位数字自动补校验位，也支持直接输入 12 位', ph: '例如：12345678901', max: 12 },
+      { key: 'CODE39', name: 'Code 39', hint: '支持 A-Z、0-9 及 - . 空格 $ / + %（不含校验位）', ph: '例如：ABC-123', max: 43 }
+    ]
+  };
+  var ECL_CAP = { L: 271, M: 210, Q: 151, H: 119 };
+
+  var state = {
+    tab: 'decode',
+    cat: 'qrcode',
+    typeIndex: 0,
+    ecl: 'M',
+    records: { decode: [], encode: [] },
+    result: null,
+    lastEncode: null
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function dateKey(ts) {
+    var d = new Date(ts);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+  }
+  function hhmm(ts) {
+    var d = new Date(ts);
+    return pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+  function friendly(ts) {
+    var today = dateKey(Date.now());
+    if (dateKey(ts) === today) return '今天 ' + hhmm(ts);
+    var y = new Date(Date.now() - 86400000);
+    if (dateKey(y.getTime()) === dateKey(ts)) return '昨天 ' + hhmm(ts);
+    var d = new Date(ts);
+    return pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + ' ' + hhmm(ts);
+  }
+  function brief(s, n) {
+    s = String(s).replace(/\s+/g, ' ').trim();
+    return s.length > n ? s.slice(0, n) + '…' : s;
+  }
+
+  /* ---------------- 模拟扫码 ---------------- */
+  var SAMPLES = [
+    { scanType: 'EAN_13', result: '6901234567892' },
+    { scanType: 'QR_CODE', result: 'https://weixin.qq.com/r/scan-code-assistant' },
+    { scanType: 'CODE_128', result: 'SN-20261027-0001' },
+    { scanType: 'QR_CODE', result: '商品：无糖乌龙茶 500ml｜批次：20261027A｜产地：福建' },
+    { scanType: 'UPC_A', result: '012345678905' },
+    { scanType: 'CODE_39', result: 'ABC-123' }
+  ];
+  var sampleIdx = 0;
+
+  var SCAN_NAME = {
+    QR_CODE: ['QR Code', 'qrcode'], EAN_13: ['EAN-13', 'barcode'], EAN_8: ['EAN-8', 'barcode'],
+    UPC_A: ['UPC-A', 'barcode'], CODE_128: ['Code 128', 'barcode'], CODE_39: ['Code 39', 'barcode'],
+    PDF_417: ['PDF417', 'qrcode'], AZTEC: ['Aztec', 'qrcode'], DATA_MATRIX: ['Data Matrix', 'qrcode']
+  };
+
+  function doScan() {
+    var s = SAMPLES[sampleIdx % SAMPLES.length];
+    sampleIdx++;
+    var meta = SCAN_NAME[s.scanType] || [s.scanType, 'barcode'];
+    var now = Date.now();
+    state.result = {
+      scanType: s.scanType,
+      codeTypeName: meta[0],
+      category: meta[1],
+      categoryName: meta[1] === 'qrcode' ? '二维码' : '一维码',
+      content: s.result,
+      time: friendly(now)
+    };
+    state.records.decode.unshift({
+      codeTypeName: meta[0], category: meta[1], content: s.result, ts: now, dateKey: dateKey(now)
+    });
+    renderResult();
+    renderHome();
+    refreshNav();
+  }
+
+  function renderResult() {
+    var r = state.result;
+    if (!r) { $('decodeResult').innerHTML = ''; return; }
+    $('decodeResult').innerHTML =
+      '<div class="card">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between">' +
+          '<div style="display:flex;gap:6px">' +
+            '<span class="badge ' + (r.category === 'qrcode' ? '' : 'mint') + '">' + esc(r.codeTypeName) + '</span>' +
+            '<span class="badge gray">' + esc(r.categoryName) + '</span>' +
+          '</div>' +
+          '<span class="muted">扫码识别</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:#8A90A2;margin:12px 0 6px">解码结果</div>' +
+        '<div class="result-body">' + esc(r.content) + '</div>' +
+        '<div class="meta-row">' +
+          '<div><div class="meta-label">识别时间</div><div class="meta-value">' + esc(r.time) + '</div></div>' +
+          '<div><div class="meta-label">字符数</div><div class="meta-value">' + r.content.length + '</div></div>' +
+          '<div><div class="meta-label">记录状态</div><div class="meta-value">已记录</div></div>' +
+        '</div>' +
+        '<div class="actions">' +
+          '<div class="mini-btn" id="btnCopyDecode">复制</div>' +
+          '<div class="mini-btn" id="btnToEncode">去制码</div>' +
+          '<div class="mini-btn primary" id="btnScan2">再扫一次</div>' +
+        '</div>' +
+      '</div>';
+
+    $('btnScan2').onclick = doScan;
+    $('btnCopyDecode').onclick = function () { copy(r.content); };
+    $('btnToEncode').onclick = function () {
+      var map = { EAN_13: 'EAN13', EAN_8: 'EAN8', UPC_A: 'UPCA', CODE_128: 'CODE128', CODE_39: 'CODE39' };
+      var target = map[r.scanType] || null;
+      switchTab('encode');
+      if (target) {
+        state.cat = 'barcode';
+        for (var i = 0; i < TYPES.barcode.length; i++) if (TYPES.barcode[i].key === target) state.typeIndex = i;
+      }
+      $('contentInput').value = r.content;
+      syncEncodeUI();
+      updateCount();
+    };
+  }
+
+  function copy(text) {
+    if (navigator.clipboard) navigator.clipboard.writeText(text);
+    toast('已复制');
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $('toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'toast';
+      el.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(20,22,31,0.86);color:#fff;font-size:13px;padding:10px 18px;border-radius:8px;z-index:99;opacity:0;transition:opacity .18s;pointer-events:none';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.style.opacity = '0'; }, 1200);
+  }
+
+  function renderHome() {
+    var dec = state.records.decode;
+    var today = dateKey(Date.now());
+    var n = dec.filter(function (r) { return r.dateKey === today; }).length;
+    $('todayCount').innerHTML = n + '<span>次</span>';
+
+    if (!dec.length) {
+      $('recentList').innerHTML = '<div class="empty">解码记录会显示在这里</div>';
+    } else {
+      $('recentList').innerHTML = dec.slice(0, 3).map(function (r) {
+        return '<div class="recent">' +
+          '<span class="badge ' + (r.category === 'qrcode' ? '' : 'mint') + '">' + esc(r.codeTypeName) + '</span>' +
+          '<div style="min-width:0;flex:1"><div class="txt">' + esc(brief(r.content, 26)) + '</div>' +
+          '<div class="time">' + esc(friendly(r.ts)) + '</div></div></div>';
+      }).join('');
+    }
+    $('ovDecode').textContent = dec.length;
+    $('ovEncode').textContent = state.records.encode.length;
+    $('mcDecode').textContent = dec.length;
+    $('mcEncode').textContent = state.records.encode.length;
+    var t = dec.filter(function (r) { return r.dateKey === today; }).length +
+            state.records.encode.filter(function (r) { return r.dateKey === today; }).length;
+    $('ovToday').textContent = t;
+  }
+
+  /* ---------------- 制码 ---------------- */
+  function currentTypes() { return TYPES[state.cat]; }
+  function currentType() { return currentTypes()[state.typeIndex] || currentTypes()[0]; }
+
+  function syncEncodeUI() {
+    document.querySelectorAll('.seg').forEach(function (el) {
+      el.classList.toggle('on', el.dataset.cat === state.cat);
+    });
+    $('typeChips').innerHTML = currentTypes().map(function (t, i) {
+      return '<div class="chip ' + (i === state.typeIndex ? 'on' : '') + '" data-type="' + i + '">' + esc(t.name) + '</div>';
+    }).join('');
+    $('typeChips').querySelectorAll('.chip').forEach(function (el) {
+      el.onclick = function () {
+        state.typeIndex = Number(el.dataset.type);
+        $('encodeResult').style.display = 'none';
+        syncEncodeUI();
+        updateCount();
+      };
+    });
+
+    $('eclWrap').style.display = state.cat === 'qrcode' ? '' : 'none';
+    $('eclChips').innerHTML = [['L', 'L · 约 7%'], ['M', 'M · 约 15%'], ['Q', 'Q · 约 25%'], ['H', 'H · 约 30%']].map(function (e) {
+      return '<div class="chip ' + (state.ecl === e[0] ? 'on' : '') + '" data-ecl="' + e[0] + '">' + e[1] + '</div>';
+    }).join('');
+    $('eclChips').querySelectorAll('.chip').forEach(function (el) {
+      el.onclick = function () {
+        state.ecl = el.dataset.ecl;
+        $('encodeResult').style.display = 'none';
+        syncEncodeUI();
+        updateCount();
+      };
+    });
+
+    $('hintText').textContent = currentType().hint;
+    $('contentInput').placeholder = currentType().ph;
+    $('btnGenerate').textContent = state.cat === 'qrcode' ? '生成二维码' : '生成一维码';
+  }
+
+  function updateCount() {
+    var s = $('contentInput').value || '';
+    var isQR = state.cat === 'qrcode';
+    var n = isQR ? QRCODE.utf8Bytes(s).length : s.length;
+    var max = isQR ? ECL_CAP[state.ecl] : currentType().max;
+    $('countText').textContent = n + ' / ' + max + (isQR ? ' 字节' : ' 字符');
+    $('btnGenerate').classList.toggle('off', s.replace(/\s/g, '').length === 0);
+  }
+
+  function drawToCanvas(canvas, cssW, cssH, fn) {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = cssW * dpr;
+    canvas.height = cssH * dpr;
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, cssW, cssH);
+    fn(ctx);
+  }
+
+  function generate() {
+    var s = $('contentInput').value || '';
+    if (!s.replace(/\s/g, '')) { toast('请先输入内容'); return; }
+    var canvas = $('codeCanvas');
+    try {
+      if (state.cat === 'qrcode') {
+        var qr = QRCODE.encode(s, { ecl: state.ecl });
+        drawToCanvas(canvas, 260, 260, function (ctx) { RENDER.drawQR(ctx, 260, 260, qr); });
+        $('resType').textContent = 'QR Code';
+        $('resVer').textContent = 'V' + qr.version + ' / ' + qr.size + '×' + qr.size;
+        $('resParam').textContent = '纠错 ' + qr.ecl + ' 级';
+        state.lastEncode = { type: 'QR Code', content: s, category: 'qrcode' };
+      } else {
+        var t = currentType();
+        var bc = BARCODE.encode(t.key, s);
+        drawToCanvas(canvas, 330, 148, function (ctx) { RENDER.drawBarcode(ctx, 330, 148, bc); });
+        $('resType').textContent = t.name;
+        $('resVer').textContent = bc.modules.length + ' 模块';
+        $('resParam').textContent = t.name;
+        state.lastEncode = { type: t.name, content: bc.displayText || s, category: 'barcode' };
+        s = bc.displayText || s;
+      }
+      $('resContent').textContent = state.lastEncode.content;
+      $('resTime').textContent = friendly(Date.now());
+      $('encodeResult').style.display = '';
+      state.records.encode.unshift({
+        codeTypeName: state.lastEncode.type,
+        category: state.lastEncode.category,
+        content: state.lastEncode.content,
+        ts: Date.now(),
+        dateKey: dateKey(Date.now())
+      });
+      renderHome();
+      $('encodeResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } catch (err) {
+      toast(err.message || '参数不合法');
+    }
+  }
+
+  /* ---------------- 历史 / 统计 ---------------- */
+  function goHistory(kind) {
+    var list = state.records[kind];
+    $('histTitle').textContent = kind === 'decode' ? '解码历史' : '制码历史';
+    $('histSub').textContent = '共 ' + list.length + ' 条记录';
+    if (!list.length) {
+      $('histList').innerHTML = '<div class="empty">还没有记录，去' + (kind === 'decode' ? '扫码解码' : '制码') + '试试</div>';
+    } else {
+      $('histList').innerHTML = list.map(function (r) {
+        return '<div class="hist-item">' +
+          '<div class="hist-head">' +
+            '<span class="badge ' + (r.category === 'qrcode' ? '' : 'mint') + '">' + esc(r.codeTypeName) + '</span>' +
+            '<span class="badge gray">' + (r.category === 'qrcode' ? '二维码' : '一维码') + '</span>' +
+            '<span class="time">' + esc(friendly(r.ts)) + '</span>' +
+          '</div>' +
+          '<div class="hist-content">' + esc(r.content) + '</div>' +
+          '<div class="hist-foot"><span>' + r.content.length + ' 个字符</span><span>长按可删除</span></div>' +
+        '</div>';
+      }).join('');
+    }
+    showScreen('history');
+    $('navTitle').textContent = $('histTitle').textContent;
+  }
+
+  function goStats(kind) {
+    var list = state.records[kind];
+    var days = [];
+    for (var i = 6; i >= 0; i--) {
+      var ts = Date.now() - i * 86400000;
+      var d = new Date(ts);
+      days.push({ key: dateKey(ts), label: (d.getMonth() + 1) + '/' + d.getDate(), count: 0, isToday: i === 0 });
+    }
+    list.forEach(function (r) {
+      days.forEach(function (d) { if (d.key === r.dateKey) d.count++; });
+    });
+    var max = Math.max.apply(null, days.map(function (d) { return d.count; }).concat([1]));
+    var week = days.reduce(function (a, b) { return a + b.count; }, 0);
+    var today = days[6].count;
+
+    $('statTitle').textContent = kind === 'decode' ? '解码统计' : '制码统计';
+    $('kTotal').textContent = list.length;
+    $('kToday').textContent = today;
+    $('kWeek').textContent = week;
+    $('kAvg').textContent = '日均 ' + (Math.round(week / 7 * 10) / 10);
+    $('chartBars').innerHTML = days.map(function (d) {
+      var h = 8 + Math.round(d.count / max * 78);
+      return '<div class="bar-col">' +
+        '<div class="bar-v">' + d.count + '</div>' +
+        '<div class="bar-track"><div class="bar ' + (d.isToday ? 'today' : '') + '" style="height:' + h + 'px"></div></div>' +
+        '<div class="bar-l ' + (d.isToday ? 'today' : '') + '">' + (d.isToday ? '今天' : d.label) + '</div>' +
+      '</div>';
+    }).join('');
+
+    var map = {};
+    list.forEach(function (r) { map[r.codeTypeName] = (map[r.codeTypeName] || 0) + 1; });
+    var dist = Object.keys(map).map(function (k) { return { name: k, count: map[k] }; })
+      .sort(function (a, b) { return b.count - a.count; });
+    $('distTitle').textContent = kind === 'decode' ? '识别码制分布' : '生成码种分布';
+    $('distCount').textContent = dist.length + ' 种';
+    $('distList').innerHTML = dist.length ? dist.map(function (d) {
+      var pct = Math.round(d.count / list.length * 100);
+      return '<div class="dist-item">' +
+        '<div class="dist-top"><span>' + esc(d.name) + '</span><span class="c">' + d.count + ' 次 · ' + pct + '%</span></div>' +
+        '<div class="dist-track"><div class="dist-bar" style="width:' + Math.max(2, pct) + '%"></div></div>' +
+      '</div>';
+    }).join('') : '<div class="empty">暂无数据</div>';
+
+    showScreen('stats');
+    $('navTitle').textContent = $('statTitle').textContent;
+  }
+
+  /* ---------------- 导航 ---------------- */
+  var navStack = [];
+  function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(function (el) {
+      el.classList.toggle('on', el.id === 'screen-' + name);
+    });
+    $('body').scrollTop = 0;
+  }
+  function switchTab(name) {
+    state.tab = name;
+    document.querySelectorAll('.tab').forEach(function (el) {
+      el.classList.toggle('on', el.dataset.tab === name);
+    });
+    showScreen(name);
+    $('navTitle').textContent = { decode: '解码', encode: '制码', mine: '我' }[name];
+    if (name === 'mine') renderHome();
+  }
+  function refreshNav() {}
+
+  document.querySelectorAll('.tab').forEach(function (el) {
+    el.onclick = function () { switchTab(el.dataset.tab); };
+  });
+  document.querySelectorAll('[data-go]').forEach(function (el) {
+    el.onclick = function () {
+      var v = el.dataset.go;
+      var parts = v.split('-');
+      if (parts[0] === 'history') goHistory(parts[1]);
+      else goStats(parts[1]);
+    };
+  });
+  document.querySelectorAll('[data-back]').forEach(function (el) {
+    el.onclick = function () { switchTab(state.tab); };
+  });
+  document.querySelectorAll('.seg').forEach(function (el) {
+    el.onclick = function () {
+      if (el.dataset.cat === state.cat) return;
+      state.cat = el.dataset.cat;
+      state.typeIndex = 0;
+      $('encodeResult').style.display = 'none';
+      syncEncodeUI();
+      updateCount();
+    };
+  });
+
+  $('btnScan').onclick = doScan;
+  $('btnGenerate').onclick = generate;
+  $('contentInput').oninput = updateCount;
+  $('btnCopyResult').onclick = function () {
+    if (state.lastEncode) copy(state.lastEncode.content);
+  };
+  $('btnDownload').onclick = function () {
+    var a = document.createElement('a');
+    a.download = 'barcode.png';
+    a.href = $('codeCanvas').toDataURL('image/png');
+    a.click();
+  };
+
+  // 初始化
+  syncEncodeUI();
+  updateCount();
+  renderHome();
+
+  (function seed() {
+    var now = Date.now();
+    var samples = [
+      { codeTypeName: 'QR Code', category: 'qrcode', content: 'https://weixin.qq.com/r/scan-code-assistant', ts: now - 3 * 3600000 },
+      { codeTypeName: 'Code 128', category: 'barcode', content: 'SN-20261027-0001', ts: now - 26 * 3600000 },
+      { codeTypeName: 'EAN-13', category: 'barcode', content: '6901234567892', ts: now - 86400000 }
+    ];
+    samples.forEach(function (s) {
+      state.records.decode.unshift({
+        codeTypeName: s.codeTypeName,
+        category: s.category,
+        content: s.content,
+        ts: s.ts,
+        dateKey: dateKey(s.ts)
+      });
+    });
+    state.records.encode.unshift({
+      codeTypeName: 'QR Code', category: 'qrcode', content: '扫码制码助理 · 示例',
+      ts: now - 5 * 3600000, dateKey: dateKey(now - 5 * 3600000)
+    });
+    renderHome();
+  })();
+
+  // 支持 hash 直达，便于逐屏预览：#encode #barcode #mine #history-decode #stats-decode
+  (function route() {
+    var h = (location.hash || '').replace('#', '');
+    if (!h) return;
+    if (h === 'encode' || h === 'barcode') {
+      switchTab('encode');
+      if (h === 'barcode') {
+        state.cat = 'barcode';
+        state.typeIndex = 1;
+        syncEncodeUI();
+      }
+      $('contentInput').value = h === 'barcode' ? '690123456789' : '扫码制码助理 · 扫码即得结果';
+      updateCount();
+      setTimeout(generate, 60);
+    } else if (h === 'mine') {
+      switchTab('mine');
+    } else if (h.indexOf('history-') === 0) {
+      goHistory(h.split('-')[1]);
+    } else if (h.indexOf('stats-') === 0) {
+      goStats(h.split('-')[1]);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
